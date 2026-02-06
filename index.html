@@ -10,24 +10,16 @@
     font-family: 'Cairo', sans-serif;
     text-align: center;
     color: #fff;
-    overflow: hidden;
+    overflow: visible;
+    position: relative;
   }
+
   h1 {
     margin-top: 50px;
     font-size: 3em;
     text-shadow: 2px 2px 10px #ff1e56;
   }
-  .heart {
-    position: absolute;
-    color: #fff;
-    font-size: 24px;
-    animation: float 6s infinite ease-in-out;
-  }
-  @keyframes float {
-    0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
-    50% { opacity: 1; }
-    100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
-  }
+
   button {
     background-color: #ff1e56;
     border: none;
@@ -37,55 +29,115 @@
     border-radius: 30px;
     cursor: pointer;
     margin-top: 40px;
-    transition: 0.3s;
   }
-  button:hover {
-    background-color: #ff4d6d;
-  }
-  .canva-embed {
+
+  .image-container {
     position: relative;
-    width: 80%;
-    margin: 40px auto;
-    box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16);
-    border-radius: 8px;
-    overflow: hidden;
+    max-width: 500px;
+    margin: 30px auto;
   }
-  iframe {
+
+  .frame-wrapper {
+    position: relative;
     width: 100%;
-    height: 500px;
+    padding-top: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(63,69,81,0.16);
+    overflow: visible; /* السماح للقلوب بالظهور خارج الإطار */
+  }
+
+  iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     border: none;
+    z-index: 1;
+  }
+
+  .hearts-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 2; /* فوق الصورة */
+    pointer-events: none;
+  }
+
+  .heart {
+    position: absolute;
+    font-size: 24px;
+    animation: float 6s linear forwards;
+  }
+
+  @keyframes float {
+    0% { bottom: 0; opacity: 0; transform: scale(0.5); }
+    30% { opacity: 1; }
+    100% { bottom: 100%; opacity: 0; transform: scale(1.2); }
+  }
+
+  /* طبقة القلوب العامة للشاشة */
+  .global-hearts {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
   }
 </style>
 </head>
+
 <body>
 
-<h1>عيد ميلاد سعيد يا عمري ❤️</h1>
+<h1>عيد ميلاد سعيد يا قلبي ❤️</h1>
 <p>كل عام وأنت الحب والفرحة في حياتنا!</p>
 
-<!-- الصورة المتحركة من Canva -->
-<div class="canva-embed">
-  <iframe loading="lazy" src="https://www.canva.com/design/DAHAjHfBhJw/SvwHYRZC-7kkv9drSNWhvw/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen"></iframe>
-</div>
-<a href="https://www.canva.com/design/DAHAjHfBhJw/SvwHYRZC-7kkv9drSNWhvw/view?utm_content=DAHAjHfBhJw&utm_campaign=designshare&utm_medium=embeds&utm_source=link" target="_blank" rel="noopener" style="color:#fff;">تصميم بواسطة Grey</a>
+<button onclick="showMessage()">اضغط لتعرف رسالة الحب 💌</button>
 
-<button onclick="showMessage()">كبسي هون لتشوفي رسالتك بوبو 💌</button>
+<div class="image-container">
+
+  <div class="frame-wrapper">
+
+    <!-- القلوب فوق الصورة -->
+    <div class="hearts-layer" id="heartsLayer"></div>
+
+    <!-- صورة Canva -->
+    <iframe
+      src="https://www.canva.com/design/DAHAjHfBhJw/SvwHYRZC-7kkv9drSNWhvw/view?embed"
+      allowfullscreen
+    ></iframe>
+
+  </div>
+
+  <a href="https://www.canva.com/design/DAHAjHfBhJw/SvwHYRZC-7kkv9drSNWhvw/view"
+     target="_blank" rel="noopener">تصميم</a> بواسطة Grey
+</div>
+
+<!-- القلوب العامة للشاشة -->
+<div class="global-hearts" id="globalHearts"></div>
 
 <script>
 function showMessage() {
   alert("أنت النبض الذي يجعل هذا اليوم أجمل ❤️");
 }
 
-function createHeart() {
-  const heart = document.createElement('div');
-  heart.classList.add('heart');
-  heart.innerHTML = '💖';
-  heart.style.left = Math.random() * 100 + 'vw';
-  heart.style.animationDuration = (3 + Math.random() * 5) + 's';
-  document.body.appendChild(heart);
-  setTimeout(() => heart.remove(), 8000);
+const hearts = ["💖", "💕", "❤️"];
+const layer = document.getElementById("heartsLayer");
+const globalLayer = document.getElementById("globalHearts");
+
+function createHeart(targetLayer) {
+  const heart = document.createElement("div");
+  heart.className = "heart";
+  heart.innerHTML = hearts[Math.floor(Math.random() * hearts.length)];
+  heart.style.left = Math.random() * 100 + "%";
+  heart.style.animationDuration = (4 + Math.random() * 3) + "s";
+  heart.style.fontSize = (20 + Math.random() * 20) + "px";
+  targetLayer.appendChild(heart);
+  setTimeout(() => heart.remove(), 7000);
 }
 
-setInterval(createHeart, 300);
+// قلوب فوق الصورة
+setInterval(() => createHeart(layer), 400);
+
+// قلوب تطفو على الشاشة
+setInterval(() => createHeart(globalLayer), 300);
 </script>
 
 </body>
